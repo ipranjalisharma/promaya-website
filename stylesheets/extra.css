@@ -1,0 +1,370 @@
+:root {
+  --md-primary-fg-color: #0b4b7c; /* Deep blue for primary theme color (links, buttons, active TOC) */
+  --md-primary-fg-color--light: #166ba8;
+  --md-primary-fg-color--dark: #072a45;
+  --md-primary-bg-color: #ffffff; /* White background for text/icons on primary */
+  --md-primary-bg-color--light: #f0f8ff;
+  
+  --md-accent-fg-color: #00bcd4; /* Cyan accent */
+  --md-accent-bg-color: #ffffff;
+  --md-typeset-a-color: #0b4b7c; /* Force standard hyperlinks to be dark blue */
+
+  /* Custom ProMaya Colors */
+  --pm-deep-blue: #0b4b7c;
+  --pm-teal: #008080;
+  --pm-cyan: #00bcd4;
+  --pm-light-blue: #e1f5fe;
+  --pm-ice: #f0f8ff;
+  --pm-marine: #1e3a5f;
+  
+  --text-main: #2C3E50;
+  --text-muted: #546E7A;
+}
+
+/* Base Body Styles */
+body {
+  background-color: var(--pm-ice);
+  color: var(--text-main);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Header & Ribbon modifications */
+.md-header {
+  background-color: var(--pm-light-blue) !important;
+  color: var(--pm-marine) !important;
+  box-shadow: 0 4px 10px rgba(11, 75, 124, 0.2);
+}
+
+.md-tabs {
+  background-color: var(--pm-ice) !important;
+}
+
+/* Sidebar Styling & Whitespace constraint */
+.md-grid {
+  max-width: 1400px;
+}
+
+/* Force TOC on right */
+.md-sidebar--secondary {
+  display: block !important;
+}
+
+/* Hide Search Bar entirely */
+.md-search {
+  display: none !important;
+}
+
+.md-nav__title {
+  font-weight: 700;
+  color: var(--pm-marine);
+}
+
+.md-nav__link {
+  color: var(--text-main) !important;
+}
+
+.md-nav__link:hover {
+  color: var(--pm-marine) !important;
+}
+
+.md-nav__link--active,
+.md-nav__item--active > .md-nav__link,
+.md-nav__link[data-md-state="active"] {
+  color: var(--pm-deep-blue) !important; 
+  font-weight: 800 !important;
+}
+
+/* Hero Section */
+.hero-section {
+  text-align: center;
+  padding: 1rem;
+  background: linear-gradient(135deg, rgba(225, 245, 254, 0.8), rgba(240, 248, 255, 0.9));
+  border-radius: 12px;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 4px 16px rgba(11, 75, 124, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+}
+
+.hero-logo {
+  max-height: 120px !important;
+  width: auto !important;
+  margin-bottom: 0.2rem;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+}
+
+.hero-title {
+  font-size: 1.4rem !important;
+  font-weight: 800 !important;
+  color: var(--pm-deep-blue) !important;
+  margin-bottom: 0.2rem !important;
+  letter-spacing: -0.5px;
+}
+
+.hero-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  max-width: 600px;
+  margin: 0 auto 0.5rem auto;
+  line-height: 1.4;
+}
+
+/* Badges */
+.hero-badges {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-bottom: 0.6rem;
+}
+
+.hero-badge {
+  padding: 0.2rem 0.6rem;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.7rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.badge-blue { background-color: #bbdefb; color: black; }
+.badge-teal { background-color: #b2dfdb; color: black; }
+.badge-cyan { background-color: #b2ebf2; color: black; }
+.badge-indigo { background-color: #c5cae9; color: black; }
+.badge-slate { background-color: #cfd8dc; color: black; }
+
+/* Call to Action Button */
+.hero-cta {
+  display: inline-block;
+  background-color: #b2ebf2;
+  color: black !important;
+  border: 2px solid var(--pm-marine);
+  padding: 0.4rem 1rem;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+}
+
+.hero-cta:hover {
+  background-color: #80deea; /* Slightly darker cyan on hover */
+  color: black !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.hero-cta-secondary {
+  background-color: white !important;
+  color: black !important;
+  border: 2px solid var(--pm-marine);
+}
+
+.hero-cta-secondary:hover {
+  background-color: var(--pm-light-blue) !important; /* Light background on hover */
+  color: black !important; /* Text stays black */
+}
+
+/* Feature Grid */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 1.2rem 0;
+}
+
+.feature-card {
+  background: white;
+  padding: 1rem 1.2rem;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+  border-left: 4px solid;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Removed hover animations */
+.feature-card.blue { border-color: var(--pm-deep-blue); }
+.feature-card.teal { border-color: var(--pm-teal); }
+.feature-card.cyan { border-color: var(--pm-cyan); }
+.feature-card.marine { border-color: var(--pm-marine); }
+
+.feature-card h3 {
+  margin-top: 0 !important;
+  color: var(--pm-marine) !important;
+  font-size: 0.95rem !important;
+  margin-bottom: 0.3rem !important;
+}
+
+.feature-card p {
+  color: var(--text-muted);
+  margin-bottom: auto;
+  padding-bottom: 0.6rem;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+/* Align badges in feature cards to bottom left */
+.feature-card .hero-badge {
+  align-self: flex-start;
+  margin-top: auto;
+}
+
+/* Figure styling for standard images */
+.doc-figure {
+  margin: 2.5rem 0;
+  text-align: center;
+  background: white;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.doc-figure img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.doc-figure figcaption {
+  margin-top: 1rem;
+  font-style: italic;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+/* Download Link Styling */
+.download-link {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--pm-light-blue);
+  color: var(--pm-deep-blue) !important;
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  border: 1px solid rgba(11, 75, 124, 0.1);
+  transition: all 0.2s ease;
+}
+
+.download-link:hover {
+  background-color: #bbdefb;
+  transform: translateY(-1px);
+}
+
+/* Admonitions overrides for deep sea theme */
+.md-typeset .admonition.info, .md-typeset details.info {
+  border-color: var(--pm-teal);
+}
+.md-typeset .admonition.info > .admonition-title, .md-typeset details.info > summary {
+  background-color: rgba(0, 128, 128, 0.1);
+}
+.md-typeset .admonition.info > .admonition-title::before, .md-typeset details.info > summary::before {
+  color: var(--pm-teal);
+}
+
+/* Stats Cards */
+.stats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin: 1rem 0;
+  max-width: 420px;
+}
+
+.stat-card {
+  flex: 1;
+  min-width: 80px;
+  background: white;
+  border-radius: 6px;
+  padding: 0.4rem 0.3rem;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+}
+
+.stat-blue::after { background-color: var(--pm-deep-blue); }
+.stat-teal::after { background-color: var(--pm-teal); }
+.stat-cyan::after { background-color: var(--pm-cyan); }
+
+.stat-value {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--pm-marine);
+  margin-bottom: 0.1rem;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Ensure strong contrast on the primary header ribbon */
+.md-header {
+  background-color: var(--pm-light-blue) !important;
+  color: var(--pm-marine) !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.md-header__button.md-logo img, .md-header__button.md-logo svg {
+  fill: var(--pm-marine) !important;
+}
+
+.md-header-nav__button, .md-header__button {
+  color: var(--pm-marine) !important;
+}
+
+.md-tabs {
+  background-color: var(--pm-ice) !important;
+  color: var(--pm-marine) !important;
+}
+
+.md-tabs__link {
+  color: var(--pm-marine) !important;
+  font-weight: 600;
+}
+
+/* Typography Overrides */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--pm-marine);
+}
+
+h1 {
+  font-weight: 800 !important;
+  letter-spacing: -0.5px;
+}
+
+h2 {
+  font-weight: 700 !important;
+  border-bottom: 2px solid var(--pm-light-blue);
+  padding-bottom: 0.5rem;
+}
+
+/* Force standard hyperlinks to be dark for visibility */
+.md-typeset a {
+  color: var(--pm-marine) !important;
+  font-weight: 600;
+}
+
+.md-typeset a:hover {
+  color: var(--pm-deep-blue) !important;
+  text-decoration: underline;
+}
