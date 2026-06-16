@@ -1063,20 +1063,20 @@
 
 
 
-<h1 id="promaya-setup-guide">ProMaya Setup Guide<a class="headerlink" href="#promaya-setup-guide" title="Permanent link">&para;</a></h1>
+<h1 id="promaya-setup-guide">ProMaya Setup Guide</h1>
 <p>This guide provides step-by-step instructions for setting up the ProMaya environment and getting started with the framework. The pipeline relies heavily on PyTorch Geometric, external bioinformatics tools, and protein language models.</p>
-<h2 id="system-requirements">System Requirements<a class="headerlink" href="#system-requirements" title="Permanent link">&para;</a></h2>
+<h2 id="system-requirements">System Requirements</h2>
 <div class="feature-grid">
-  <div class="feature-card blue">
+  <div class="sys-req-card blue">
     <h3>CPU</h3>
     <p>Multi-core processor (8+ cores recommended) for rapid memory-mapping and multi-threaded data extraction.</p>
   </div>
-  <div class="feature-card cyan">
+  <div class="sys-req-card cyan">
     <h3>RAM</h3>
     <p><strong>≥32 GB</strong> minimum, <strong>64 GB+</strong> recommended for full dataset training.</p>
     <span class="hero-badge badge-cyan">32 GB+</span>
   </div>
-  <div class="feature-card teal">
+  <div class="sys-req-card teal">
     <h3>GPU</h3>
     <p>NVIDIA GPU with <strong>16GB+ VRAM</strong> (RTX 3090, A100, V100) for HGT and ProtTrans embeddings.</p>
     <span class="hero-badge badge-teal">CUDA 11.8+</span>
@@ -1084,9 +1084,9 @@
 </div>
 
 <hr />
-<h2 id="environment-setup">Environment Setup<a class="headerlink" href="#environment-setup" title="Permanent link">&para;</a></h2>
+<h2 id="environment-setup">Environment Setup</h2>
 <p>We recommend using Conda to cleanly isolate the deep learning dependencies from system Python.</p>
-<h3 id="1-create-the-environment">1. Create the Environment<a class="headerlink" href="#1-create-the-environment" title="Permanent link">&para;</a></h3>
+<h3 id="1-create-the-environment">1. Create the Environment</h3>
 <p>Clone the repository and create the Conda environment. ProMaya provides a CPU base environment and an optional GPU overlay.</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Navigate to the project directory</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span>/path/to/promaya
@@ -1097,27 +1097,27 @@
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Activate the environment</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>conda<span class="w"> </span>activate<span class="w"> </span>promaya
 </span></code></pre></div>
-<h3 id="2-enable-nvidia-gpu-acceleration">2. Enable NVIDIA GPU Acceleration<a class="headerlink" href="#2-enable-nvidia-gpu-acceleration" title="Permanent link">&para;</a></h3>
+<h3 id="2-enable-nvidia-gpu-acceleration">2. Enable NVIDIA GPU Acceleration</h3>
 <p>If you are running on a Linux or Windows machine with an NVIDIA GPU, apply the GPU overlay to ensure PyTorch and PyTorch Geometric are correctly compiled with CUDA 11.8:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Linux/Windows NVIDIA systems only</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>conda<span class="w"> </span>env<span class="w"> </span>update<span class="w"> </span>-n<span class="w"> </span>promaya<span class="w"> </span>-f<span class="w"> </span>environment.gpu.yml
 </span></code></pre></div>
 <p>warning "macOS Users"
     Do not run the GPU overlay on macOS. Apple Silicon users should rely on the base CPU environment.</p>
-<h3 id="3-verify-pytorch-pyg">3. Verify PyTorch &amp; PyG<a class="headerlink" href="#3-verify-pytorch-pyg" title="Permanent link">&para;</a></h3>
+<h3 id="3-verify-pytorch-pyg">3. Verify PyTorch &amp; PyG</h3>
 <p>It is crucial that PyTorch Geometric is correctly installed with CUDA support to enable the Heterogeneous Graph Transformer (HGT) module.</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import torch; print(f&#39;PyTorch: {torch.__version__} | CUDA: {torch.cuda.is_available()}&#39;)&quot;</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import torch_geometric; print(f&#39;PyG Version: {torch_geometric.__version__}&#39;)&quot;</span>
 </span></code></pre></div>
 <hr />
-<h2 id="external-tools-installation">External Tools Installation<a class="headerlink" href="#external-tools-installation" title="Permanent link">&para;</a></h2>
+<h2 id="external-tools-installation">External Tools Installation</h2>
 <p>ProMaya utilizes several standard structural bioinformatics tools to compute its multimodal features. These must be installed and accessible in your system <code>PATH</code>.</p>
-<h3 id="dssp-secondary-structure">DSSP (Secondary Structure)<a class="headerlink" href="#dssp-secondary-structure" title="Permanent link">&para;</a></h3>
+<h3 id="dssp-secondary-structure">DSSP (Secondary Structure)</h3>
 <p>Used for computing residue-level solvent accessibility and secondary structure codes.
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>sudo<span class="w"> </span>apt-get<span class="w"> </span>update
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>dssp
 </span></code></pre></div></p>
-<h3 id="msms-molecular-surface">MSMS (Molecular Surface)<a class="headerlink" href="#msms-molecular-surface" title="Permanent link">&para;</a></h3>
+<h3 id="msms-molecular-surface">MSMS (Molecular Surface)</h3>
 <p>Used for triangulating the solvent-excluded surface and generating the Point Cloud features.
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>mkdir<span class="w"> </span>-p<span class="w"> </span>~/tools/msms
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">cd</span><span class="w"> </span>~/tools/msms
@@ -1126,7 +1126,7 @@
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;export PATH=$PATH:~/tools/msms&#39;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>~/.bashrc
 </span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="nb">source</span><span class="w"> </span>~/.bashrc
 </span></code></pre></div></p>
-<h3 id="psi-blast-pssm-generation">PSI-BLAST (PSSM Generation)<a class="headerlink" href="#psi-blast-pssm-generation" title="Permanent link">&para;</a></h3>
+<h3 id="psi-blast-pssm-generation">PSI-BLAST (PSSM Generation)</h3>
 <p>Required for generating Position-Specific Scoring Matrices (PSSMs) as evolutionary features.
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Install BLAST+</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>ncbi-blast+
@@ -1140,7 +1140,7 @@
 <p>info "Configuration Note"
     Remember to update <code>config/config.yaml</code> to point to your <code>uniref90</code> database path.</p>
 <hr />
-<h2 id="quick-start-prottrans-caching">Quick Start (ProtTrans Caching)<a class="headerlink" href="#quick-start-prottrans-caching" title="Permanent link">&para;</a></h2>
+<h2 id="quick-start-prottrans-caching">Quick Start (ProtTrans Caching)</h2>
 <p>The ProtTrans-T5-XL-UniRef50 model is a massive 3B-parameter language model. It is highly recommended to cache it locally before running the pipeline.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">T5Tokenizer</span><span class="p">,</span> <span class="n">T5EncoderModel</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>

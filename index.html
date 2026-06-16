@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#the-ppi-challenge" class="md-skip">
+        <a href="#what-is-promaya" class="md-skip">
           Skip to content
         </a>
       
@@ -366,10 +366,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-ppi-challenge" class="md-nav__link">
+  <a href="#what-is-promaya" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The PPI Challenge
+        What is ProMaya?
       
     </span>
   </a>
@@ -377,16 +377,38 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-promaya-solution" class="md-nav__link">
+  <a href="#decoding-protein-interactions" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The ProMaya Solution
+        Decoding Protein Interactions
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="The ProMaya Solution">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-promaya-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How ProMaya Works
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="How ProMaya Works">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#architecture-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture Overview
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#unprecedented-interpretability" class="md-nav__link">
@@ -985,19 +1007,20 @@
 
 
 
+  <h1>Home</h1>
+
 <div class="hero-section">
   <img src="assets/images/logo.png" alt="ProMaya Logo" class="hero-logo" />
-  <h1 class="hero-title">ProMaya</h1>
   <p class="hero-subtitle">
     A Hierarchical Multimodal Deep Learning Framework for Accurate and Interpretable Protein-Protein Interaction (PPI) Prediction.
   </p>
 
   <div class="hero-badges">
-    <span class="hero-badge badge-blue">Hybrid Neural-XGBoost</span>
     <span class="hero-badge badge-cyan">LSMD Atomic Features</span>
-    <span class="hero-badge badge-teal">Heterogeneous Graph Transformer</span>
     <span class="hero-badge badge-indigo">ProtTrans-650M LM</span>
-    <span class="hero-badge badge-slate">Multi-Scale Attribution</span>
+    <span class="hero-badge badge-slate">Multi-Scale Attention</span>
+    <span class="hero-badge badge-teal">Heterogeneous Graph Transformer</span>
+    <span class="hero-badge badge-blue">Hybrid Neural-XGBoost</span>
   </div>
 
   <a href="architecture/overview.html" class="hero-cta">Explore the Architecture</a>
@@ -1005,29 +1028,38 @@
 </div>
 
 <hr />
-<h2 id="the-ppi-challenge">The PPI Challenge<a class="headerlink" href="#the-ppi-challenge" title="Permanent link">&para;</a></h2>
+<hr />
+<h2 id="what-is-promaya">What is ProMaya?</h2>
+<p><strong>ProMaya</strong> is a state-of-the-art computational framework designed to accurately predict Protein-Protein Interactions (PPIs) by modeling both sequence and structural features. Unlike traditional methods that rely solely on 1D sequences or rigid 3D geometries, ProMaya fuses multi-scale biological information—ranging from precise atomic electron density to global protein structure and deep language model embeddings—into a single unified deep learning architecture.</p>
+<h2 id="decoding-protein-interactions">Decoding Protein Interactions</h2>
 <p>Protein-Protein Interactions (PPIs) are the fundamental drivers of cellular function, orchestrating pathways, immune responses, and molecular machineries. Accurate prediction of PPIs from primary sequence and tertiary structure remains a grand challenge in computational biology due to the multi-scale nature of protein interactions—ranging from sub-atomic electron cloud overlapping to global geometric shape complementarity.</p>
 <figure class="doc-figure">
   <img src="assets/images/ppi_biology.jpg" alt="Overview of PPI Biology" />
-  <figcaption>Protein-protein interactions span multiple scales: from sequence-level domains down to precise atomic contacts mediated by electron density.</figcaption>
+  <figcaption>Protein-protein interactions span multiple scales: from sequence-level domains down to precise atomic contact mediated by electron density</figcaption>
 </figure>
 
-<h2 id="the-promaya-solution">The ProMaya Solution<a class="headerlink" href="#the-promaya-solution" title="Permanent link">&para;</a></h2>
-<p><strong>ProMaya</strong> directly addresses these challenges through a 5-module <strong>Hierarchical Multimodal Deep Learning</strong> approach. It doesn't just look at amino acids; it parses proteins across four distinct modalities:</p>
+<h2 id="how-promaya-works">How ProMaya Works</h2>
+<p><strong>ProMaya</strong> directly addresses these challenges through a 5-module <strong>Hierarchical Multimodal Deep Learning</strong> approach. It parses proteins across four distinct modalities before fusing them into a unified representation:</p>
 <ol>
-<li><strong>Atomic Graph (41-d)</strong>: Introducing the <strong>Local Surface Mass Density (LSMD)</strong> hypothesis to capture electron density proxies at binding interfaces.</li>
+<li><strong>Atomic Graph (41-d)</strong>: Introducing the <strong>Local Surface Mass Density (LSMD)</strong> hypothesis to capture explicit electron density proxies at binding interfaces.</li>
 <li><strong>Residue Graph (1082-d)</strong>: Fusing biochemical properties, ProtTrans-650M language model embeddings, and intrinsic disorder metrics (IUPred2A).</li>
-<li><strong>Surface Point Cloud (14-d)</strong>: Modeling 3D geometric shape and electrostatic complementarity.</li>
-<li><strong>Sequence Context</strong>: Leveraging deep evolutionary information from PSSMs.</li>
+<li><strong>Surface Point Cloud (14-d)</strong>: Modeling 3D geometric shape and electrostatic complementarity using a PointNet++ backbone.</li>
+<li><strong>Sequence Context</strong>: Leveraging deep evolutionary information from PSSMs to understand long-range mutational conservation.</li>
 </ol>
-<h3 id="unprecedented-interpretability">Unprecedented Interpretability<a class="headerlink" href="#unprecedented-interpretability" title="Permanent link">&para;</a></h3>
-<p>ProMaya isn't a black box. Through a novel application of <strong>Graph Grad-CAM</strong> and SHAP value analysis, ProMaya provides attribution at multiple scales:</p>
+<h3 id="architecture-overview">Architecture Overview</h3>
+<figure class="doc-figure wide-figure">
+  <img src="assets/images/architecture.png" alt="ProMaya Multimodal Framework Architecture" />
+  <figcaption>The 5-module ProMaya pipeline: From feature extraction and multimodal alignment through<br>Heterogeneous Graph Transformer (HGT) encoding, cross-protein attention, and hybrid classification.</figcaption>
+</figure>
+
+<h3 id="unprecedented-interpretability">Unprecedented Interpretability</h3>
+<p>ProMaya isn't a black box. Through a novel application of <strong>Graph Grad-CAM</strong> and SHAP analysis, ProMaya provides attribution at multiple scales:</p>
 <ul>
 <li><strong>Residue-Level Maps</strong>: Identifying exact binding interface hotspots.</li>
 <li><strong>Atom-Level Maps</strong>: Highlighting specific chemical groups driving the interaction.</li>
 <li><strong>IDR Focus</strong>: Understanding the role of flexible linker regions in transient binding.</li>
 </ul>
-<h3 id="get-started">Get Started<a class="headerlink" href="#get-started" title="Permanent link">&para;</a></h3>
+<h3 id="get-started">Get Started</h3>
 <p>Proceed to the <a href="setup_guide.html">Setup Guide</a> to initialize your environment, or dive deep into the mathematical formulations in the <a href="architecture/overview.html">Architecture Overview</a>.</p>
 
 

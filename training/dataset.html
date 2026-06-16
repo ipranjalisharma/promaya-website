@@ -983,20 +983,20 @@
 
 
 
-<h1 id="dataset-construction">Dataset Construction<a class="headerlink" href="#dataset-construction" title="Permanent link">&para;</a></h1>
+<h1 id="dataset-construction">Dataset Construction</h1>
 <p>Training a highly expressive framework like ProMaya requires a massive, perfectly balanced, and extremely difficult dataset. If the model is only shown "easy" negative examples (like proteins that don't even belong in the same cell), it will fail to learn true binding physics.</p>
 <figure class="doc-figure">
   <img src="../assets/images/dataset.png" alt="ProMaya Dataset Construction Pipeline" />
   <figcaption>The 88,740-pair dataset undergoes rigorous 70:30 CD-HIT clustering to prevent sequence leakage, and is balanced with 5 tiers of increasingly difficult negative pairs.</figcaption>
 </figure>
 
-<h2 id="the-88740-protein-pairs">The 88,740 Protein Pairs<a class="headerlink" href="#the-88740-protein-pairs" title="Permanent link">&para;</a></h2>
+<h2 id="the-88740-protein-pairs">The 88,740 Protein Pairs</h2>
 <p>ProMaya is trained on exactly <strong>88,740</strong> protein pairs, curated primarily from PDBbind and DIPS-PLUS.
 - <strong>Positive Pairs</strong>: 44,370 experimentally validated interacting chains.
 - <strong>Negative Pairs</strong>: 44,370 non-interacting chains, carefully constructed (see below).</p>
-<h3 id="cd-hit-splitting-strategy">CD-HIT Splitting Strategy<a class="headerlink" href="#cd-hit-splitting-strategy" title="Permanent link">&para;</a></h3>
+<h3 id="cd-hit-splitting-strategy">CD-HIT Splitting Strategy</h3>
 <p>To prevent the model from simply memorizing sequence homology, the data is split 70% Train / 30% Test at the <strong>CD-HIT Sequence Cluster level</strong>. This guarantees that no protein cluster spans multiple splits; if Protein A is in the training set, no protein with <span class="arithmatex">\(&gt;30\%\)</span> sequence identity to A will appear in the test set.</p>
-<h2 id="the-5-tier-negative-sampling">The 5-Tier Negative Sampling<a class="headerlink" href="#the-5-tier-negative-sampling" title="Permanent link">&para;</a></h2>
+<h2 id="the-5-tier-negative-sampling">The 5-Tier Negative Sampling</h2>
 <p>The 44,370 negative pairs are not just random pairings. They are heavily engineered across 5 categories of increasing difficulty to force ProMaya to learn true geometric and biochemical binding rules.</p>
 <table>
 <thead>

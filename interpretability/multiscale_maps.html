@@ -988,18 +988,18 @@
 
 
 
-<h1 id="multi-scale-attribution">Multi-Scale Attribution<a class="headerlink" href="#multi-scale-attribution" title="Permanent link">&para;</a></h1>
+<h1 id="multi-scale-attribution">Multi-Scale Attribution</h1>
 <p>Because ProMaya processes data across four different node types (Atom, Residue, Surface, Sequence), the Graph Grad-CAM scores can be aggregated to provide biological insights at multiple resolutions.</p>
-<h2 id="1-residue-level-binding-maps">1. Residue-Level Binding Maps<a class="headerlink" href="#1-residue-level-binding-maps" title="Permanent link">&para;</a></h2>
+<h2 id="1-residue-level-binding-maps">1. Residue-Level Binding Maps</h2>
 <p>By aggregating the scores of all <code>Residue</code> nodes, ProMaya outputs a 1D vector (length <span class="arithmatex">\(L\)</span>) representing the binding interface hotspot.
 - <strong>Use Case</strong>: Direct validation against known interface residues. Identifies which specific amino acids govern the binding event, guiding alanine scanning mutagenesis experiments.</p>
-<h2 id="2-atom-level-pharmacophores">2. Atom-Level Pharmacophores<a class="headerlink" href="#2-atom-level-pharmacophores" title="Permanent link">&para;</a></h2>
+<h2 id="2-atom-level-pharmacophores">2. Atom-Level Pharmacophores</h2>
 <p>By aggregating the scores of the <code>Atom</code> nodes, the attribution map achieves sub-Angstrom resolution.
 - <strong>Use Case</strong>: Pinpoints the precise chemical groups driving the interaction (e.g., identifying that a specific aromatic ring on a Tyrosine, rather than the backbone, is providing the <span class="arithmatex">\(\pi-\pi\)</span> stacking interaction).</p>
-<h2 id="3-surface-hotspots">3. Surface Hotspots<a class="headerlink" href="#3-surface-hotspots" title="Permanent link">&para;</a></h2>
+<h2 id="3-surface-hotspots">3. Surface Hotspots</h2>
 <p>By aggregating the scores of the <code>Surface</code> nodes (from the PointNet++ cloud).
 - <strong>Use Case</strong>: Visualizes the geometric and electrostatic "patches" on the protein exterior that form the lock-and-key fit, independent of the underlying amino acid sequence.</p>
-<h2 id="4-intrinsic-disorder-region-idr-focus">4. Intrinsic Disorder Region (IDR) Focus<a class="headerlink" href="#4-intrinsic-disorder-region-idr-focus" title="Permanent link">&para;</a></h2>
+<h2 id="4-intrinsic-disorder-region-idr-focus">4. Intrinsic Disorder Region (IDR) Focus</h2>
 <p>By correlating the <code>Residue</code> attribution scores with the IUPred2A disorder metric.
 - <strong>Use Case</strong>: Highlights the role of flexible linker regions in binding. Many proteins undergo "folding upon binding," where a disordered region becomes structured only upon contact with its partner. ProMaya explicitly highlights these transient mechanisms.</p>
 <blockquote>

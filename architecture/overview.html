@@ -955,14 +955,14 @@
 
 
 
-<h1 id="promaya-architecture-overview">ProMaya Architecture Overview<a class="headerlink" href="#promaya-architecture-overview" title="Permanent link">&para;</a></h1>
+<h1 id="promaya-architecture-overview">ProMaya Architecture Overview</h1>
 <p>The ProMaya framework is a highly specialized pipeline composed of <strong>5 distinct modules</strong> that transform raw protein pairs (PDB coordinates and FASTA sequences) into an interaction probability, along with multi-scale attribution maps.</p>
 <figure class="doc-figure wide-figure">
   <img src="../assets/images/architecture.png" alt="ProMaya Multimodal Framework Architecture" />
   <figcaption>The 5-module ProMaya pipeline: From feature extraction and multimodal alignment through Heterogeneous Graph Transformer (HGT) encoding, cross-protein attention, and hybrid classification.</figcaption>
 </figure>
 
-<h2 id="pipeline-modules">Pipeline Modules<a class="headerlink" href="#pipeline-modules" title="Permanent link">&para;</a></h2>
+<h2 id="pipeline-modules">Pipeline Modules</h2>
 <p>The computational flow of ProMaya is divided into five sequential steps. Modules 1-3 operate on each protein individually to learn deep structural and contextual representations. Modules 4-5 model the complex interplay <em>between</em> the two proteins.</p>
 <div class="feature-grid">
   <div class="feature-card blue">

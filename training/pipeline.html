@@ -994,12 +994,12 @@
 
 
 
-<h1 id="training-pipeline">Training Pipeline<a class="headerlink" href="#training-pipeline" title="Permanent link">&para;</a></h1>
+<h1 id="training-pipeline">Training Pipeline</h1>
 <p>The ProMaya training loop optimizes the entire 5-module deep learning framework end-to-end (excluding the XGBoost head, which is fit post-hoc).</p>
-<h2 id="the-hybrid-loss-function">The Hybrid Loss Function<a class="headerlink" href="#the-hybrid-loss-function" title="Permanent link">&para;</a></h2>
+<h2 id="the-hybrid-loss-function">The Hybrid Loss Function</h2>
 <p>Because ProMaya fuses modalities from vastly different scales (Atoms to Language Models), a simple Binary Cross-Entropy (BCE) loss is insufficient. The network is trained using a complex, multi-objective loss function:</p>
 <div class="arithmatex">\[ L_{total} = L_{BCE} + 0.1 \cdot L_{contrastive} + 0.05 \cdot L_{LSMD} + 0.05 \cdot L_{IDR} + 0.2 \cdot L_{focal} \]</div>
-<h3 id="breakdown">Breakdown:<a class="headerlink" href="#breakdown" title="Permanent link">&para;</a></h3>
+<h3 id="breakdown">Breakdown:</h3>
 <ol>
 <li><strong><span class="arithmatex">\(L_{BCE}\)</span> (Primary)</strong>: Standard binary cross-entropy on the interaction probability.</li>
 <li><strong><span class="arithmatex">\(L_{focal}\)</span> (Mining)</strong>: Focal loss (<span class="arithmatex">\(\gamma=2\)</span>) to heavily penalize the network for getting the "Extreme Difficulty" docking-derived negatives wrong.</li>
@@ -1007,7 +1007,7 @@
 <li><strong><span class="arithmatex">\(L_{LSMD}\)</span> (Physics)</strong>: <span class="arithmatex">\(L_1\)</span> loss enforcing that the abstract embeddings preserve the physical Local Surface Mass Density distribution.</li>
 <li><strong><span class="arithmatex">\(L_{IDR}\)</span> (Disorder)</strong>: BCE loss ensuring the network maintains an accurate representation of Intrinsic Disorder Regions.</li>
 </ol>
-<h2 id="optimization-strategy">Optimization Strategy<a class="headerlink" href="#optimization-strategy" title="Permanent link">&para;</a></h2>
+<h2 id="optimization-strategy">Optimization Strategy</h2>
 <ul>
 <li><strong>Optimizer</strong>: AdamW (Learning Rate <span class="arithmatex">\(= 1\times10^{-4}\)</span>, Weight Decay <span class="arithmatex">\(= 1\times10^{-2}\)</span>)</li>
 <li><strong>Scheduler</strong>: Cosine Annealing (<span class="arithmatex">\(T_{max} = 100\)</span>, <span class="arithmatex">\(\eta_{min} = 1\times10^{-6}\)</span>)</li>
@@ -1015,7 +1015,33 @@
 <li><strong>Gradient Clipping</strong>: Norm 1.0 (Crucial to prevent explosions from the Heterogeneous Graph Transformer)</li>
 <li><strong>Mixed Precision</strong>: FP16 (bfloat16) training enabled to drastically reduce VRAM usage.</li>
 </ul>
-<h2 id="computational-scale">Computational Scale<a class="headerlink" href="#computational-scale" title="Permanent link">&para;</a></h2>
+<div class="language-python highlight"><span class="filename">src/training/loop.py</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">train_epoch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">dataloader</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">epoch</span><span class="p">):</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">total_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="k">for</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="p">(</span><span class="n">protein_a</span><span class="p">,</span> <span class="n">protein_b</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataloader</span><span class="p">):</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>        <span class="n">protein_a</span> <span class="o">=</span> <span class="n">move_to_device</span><span class="p">(</span><span class="n">protein_a</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>        <span class="n">protein_b</span> <span class="o">=</span> <span class="n">move_to_device</span><span class="p">(</span><span class="n">protein_b</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>        <span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>        <span class="c1"># Forward pass (end-to-end through Modules 1-5)</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>        <span class="n">predictions</span><span class="p">,</span> <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">protein_a</span><span class="p">,</span> <span class="n">protein_b</span><span class="p">)</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>        <span class="c1"># Calculate hybrid loss</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>        <span class="n">loss</span><span class="p">,</span> <span class="n">loss_dict</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>        <span class="c1"># Gradient clipping prevents HGT explosions</span>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>        <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">clip_grad_norm_</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">max_norm</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>        <span class="n">total_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>    <span class="k">return</span> <span class="n">total_loss</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataloader</span><span class="p">)</span>
+</span></code></pre></div>
+<h2 id="computational-scale">Computational Scale</h2>
 <p>Training the full ProMaya model is computationally demanding due to the explicit atomic graphs and 3D point clouds.</p>
 <div class="stats-row">
   <div class="stat-card stat-blue">

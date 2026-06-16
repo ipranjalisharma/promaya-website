@@ -1005,7 +1005,7 @@
 
 
 
-<h1 id="module-2-cross-level-multimodal-alignment">Module 2: Cross-Level Multimodal Alignment<a class="headerlink" href="#module-2-cross-level-multimodal-alignment" title="Permanent link">&para;</a></h1>
+<h1 id="module-2-cross-level-multimodal-alignment">Module 2: Cross-Level Multimodal Alignment</h1>
 <p>After extracting the four distinct data modalities (Atom, Residue, Surface, Sequence), ProMaya must synthesize them. Operating on them independently would miss critical biophysical realities—for example, an evolutionarily conserved residue (Sequence) is only a binding hotspot if it is exposed on the geometry (Surface) with the right charge density (Atom).</p>
 <p>Module 2 utilizes a <strong>4-Stage Bidirectional Cross-Attention</strong> mechanism to achieve this fusion.</p>
 <pre class="mermaid"><code>graph TD
@@ -1018,28 +1018,60 @@
     style R fill:#b2ebf2,stroke:#008080,stroke-width:2px,color:#0b4b7c
     style S fill:#e1f5fe,stroke:#00bcd4,stroke-width:2px,color:#0b4b7c
     style Seq fill:#f0f8ff,stroke:#1e3a5f,stroke-width:2px,color:#0b4b7c</code></pre>
-<h2 id="the-4-stages">The 4 Stages<a class="headerlink" href="#the-4-stages" title="Permanent link">&para;</a></h2>
+<h2 id="the-4-stages">The 4 Stages</h2>
 <p>Each stage utilizes 2 blocks of 8-head cross-attention.</p>
-<h3 id="stage-1-atom-residue">Stage 1: Atom → Residue<a class="headerlink" href="#stage-1-atom-residue" title="Permanent link">&para;</a></h3>
+<h3 id="stage-1-atom-residue">Stage 1: Atom → Residue</h3>
 <ul>
 <li><strong>Mechanism</strong>: Fuses atomic-level electron density (LSMD) and precise chemical geometry up into the residue-level embeddings.</li>
 <li><strong>Biological Purpose</strong>: Ensures that the residue's "understanding" of its environment is grounded in actual physical mass density, rather than just abstract amino acid type.</li>
 </ul>
-<h3 id="stage-2-residue-surface">Stage 2: Residue → Surface<a class="headerlink" href="#stage-2-residue-surface" title="Permanent link">&para;</a></h3>
+<h3 id="stage-2-residue-surface">Stage 2: Residue → Surface</h3>
 <ul>
 <li><strong>Mechanism</strong>: Projects the aggregated biochemical properties (charge, hydrophobicity, secondary structure) onto the triangulated 3D surface points.</li>
 <li><strong>Biological Purpose</strong>: Gives the "dumb" geometric shapes (from PointNet++) explicit chemical meaning, creating a true physiochemical binding landscape.</li>
 </ul>
-<h3 id="stage-3-surface-sequence">Stage 3: Surface → Sequence<a class="headerlink" href="#stage-3-surface-sequence" title="Permanent link">&para;</a></h3>
+<h3 id="stage-3-surface-sequence">Stage 3: Surface → Sequence</h3>
 <ul>
 <li><strong>Mechanism</strong>: Takes the 3D spatial geometry and maps it to the 1D sequence embeddings (ProtTrans).</li>
 <li><strong>Biological Purpose</strong>: Grounds the abstract, language-model learned evolutionary signals in physical 3D reality.</li>
 </ul>
-<h3 id="stage-4-sequence-residue">Stage 4: Sequence → Residue<a class="headerlink" href="#stage-4-sequence-residue" title="Permanent link">&para;</a></h3>
+<h3 id="stage-4-sequence-residue">Stage 4: Sequence → Residue</h3>
 <ul>
 <li><strong>Mechanism</strong>: Feeds the fully enriched, geometrically-aware evolutionary context back to the primary residue graph.</li>
 <li><strong>Biological Purpose</strong>: Completes the loop, ensuring the final residue graph nodes possess both micro-physical (Atomic) and macro-contextual (Sequence) intelligence.</li>
 </ul>
+<div class="language-python highlight"><span class="filename">src/models/alignment.py</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="k">class</span><span class="w"> </span><span class="nc">MultimodalAlignment</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_model</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span> <span class="n">nhead</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">):</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>        <span class="c1"># Cross-attention blocks for the 4 stages</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">atom_to_res</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MultiheadAttention</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">nhead</span><span class="p">,</span> <span class="n">batch_first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">res_to_surf</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MultiheadAttention</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">nhead</span><span class="p">,</span> <span class="n">batch_first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">surf_to_seq</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MultiheadAttention</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">nhead</span><span class="p">,</span> <span class="n">batch_first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">seq_to_res</span>  <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MultiheadAttention</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">nhead</span><span class="p">,</span> <span class="n">batch_first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">surf</span><span class="p">,</span> <span class="n">seq</span><span class="p">):</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>        <span class="c1"># Stage 1: Atom -&gt; Residue</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>        <span class="c1"># Query: Residue, Key/Value: Atom</span>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>        <span class="n">res_aligned</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_to_res</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="n">res</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">atom</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">atom</span><span class="p">)</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>        <span class="n">res</span> <span class="o">=</span> <span class="n">res</span> <span class="o">+</span> <span class="n">res_aligned</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>        <span class="c1"># Stage 2: Residue -&gt; Surface</span>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>        <span class="n">surf_aligned</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">res_to_surf</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="n">surf</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">res</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">res</span><span class="p">)</span>
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>        <span class="n">surf</span> <span class="o">=</span> <span class="n">surf</span> <span class="o">+</span> <span class="n">surf_aligned</span>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>        <span class="c1"># Stage 3: Surface -&gt; Sequence</span>
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>        <span class="n">seq_aligned</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">surf_to_seq</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="n">seq</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">surf</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">surf</span><span class="p">)</span>
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>        <span class="n">seq</span> <span class="o">=</span> <span class="n">seq</span> <span class="o">+</span> <span class="n">seq_aligned</span>
+</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>
+</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>        <span class="c1"># Stage 4: Sequence -&gt; Residue</span>
+</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>        <span class="n">res_final</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seq_to_res</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="n">res</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">seq</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">seq</span><span class="p">)</span>
+</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>        <span class="n">res</span> <span class="o">=</span> <span class="n">res</span> <span class="o">+</span> <span class="n">res_final</span>
+</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>
+</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>        <span class="k">return</span> <span class="n">atom</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">surf</span><span class="p">,</span> <span class="n">seq</span>
+</span></code></pre></div>
 <blockquote>
 <p>[TIP]
 <strong>Auxiliary Alignment Losses</strong>

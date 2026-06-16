@@ -988,9 +988,9 @@
 
 
 
-<h1 id="module-1-feature-extraction">Module 1: Feature Extraction<a class="headerlink" href="#module-1-feature-extraction" title="Permanent link">&para;</a></h1>
+<h1 id="module-1-feature-extraction">Module 1: Feature Extraction</h1>
 <p>ProMaya processes each input protein (PDB + FASTA) into four distinct data modalities. This ensures the model captures biological information ranging from deep evolutionary history down to physical atomic packing.</p>
-<h2 id="1-atomic-features-lsmd-core-hypothesis">1. Atomic Features &amp; LSMD (Core Hypothesis)<a class="headerlink" href="#1-atomic-features-lsmd-core-hypothesis" title="Permanent link">&para;</a></h2>
+<h2 id="1-atomic-features-lsmd-core-hypothesis">1. Atomic Features &amp; LSMD (Core Hypothesis)</h2>
 <p>The most critical innovation in ProMaya is the <strong>Local Surface Mass Density (LSMD)</strong> hypothesis. Since explicit electron cloud calculations (like DFT) are computationally infeasible for whole proteins, LSMD serves as a biophysical proxy for electron density at the binding interface.</p>
 <blockquote>
 <p>[IMPORTANT]
@@ -1002,7 +1002,30 @@
 <p><strong>Atomic Graph Construction:</strong>
 - <strong>Nodes</strong>: Heavy atoms. 41-dimensional features including atom type, chemical descriptors, B-factor, LSMD, and RBF distances.
 - <strong>Edges</strong>: Formed between atoms within an <span class="arithmatex">\(8.0\text{\AA}\)</span> radius, utilizing 35-dimensional geometric features.</p>
-<h2 id="2-residue-level-features">2. Residue-Level Features<a class="headerlink" href="#2-residue-level-features" title="Permanent link">&para;</a></h2>
+<div class="language-python highlight"><span class="filename">src/data/features.py</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">torch_geometric.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Data</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="k">def</span><span class="w"> </span><span class="nf">build_atomic_graph</span><span class="p">(</span><span class="n">atom_coords</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">atom_features</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Data</span><span class="p">:</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="c1"># Compute pairwise distances</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">dist_matrix</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cdist</span><span class="p">(</span><span class="n">atom_coords</span><span class="p">,</span> <span class="n">atom_coords</span><span class="p">)</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="c1"># 1. Calculate LSMD (Local Surface Mass Density) proxy</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">sigma</span> <span class="o">=</span> <span class="mf">1.0</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="n">lsmd_weights</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">dist_matrix</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">sigma</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="c1"># Mask out atoms beyond 6.0 Angstroms</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="n">lsmd_weights</span> <span class="o">=</span> <span class="n">lsmd_weights</span> <span class="o">*</span> <span class="p">(</span><span class="n">dist_matrix</span> <span class="o">&lt;=</span> <span class="mf">6.0</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="c1"># Assume atom_features[:, 0] is mass</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="n">lsmd_scores</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">lsmd_weights</span> <span class="o">*</span> <span class="n">atom_features</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>    <span class="c1"># Concatenate LSMD to atomic features</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>    <span class="n">augmented_features</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">atom_features</span><span class="p">,</span> <span class="n">lsmd_scores</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)],</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>    <span class="c1"># 2. Build edges (8.0 Angstrom cutoff)</span>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>    <span class="n">edge_index</span> <span class="o">=</span> <span class="p">(</span><span class="n">dist_matrix</span> <span class="o">&lt;=</span> <span class="mf">8.0</span><span class="p">)</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">as_tuple</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>    <span class="k">return</span> <span class="n">Data</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">augmented_features</span><span class="p">,</span> <span class="n">edge_index</span><span class="o">=</span><span class="n">edge_index</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">atom_coords</span><span class="p">)</span>
+</span></code></pre></div>
+<h2 id="2-residue-level-features">2. Residue-Level Features</h2>
 <p>The residue graph aggregates vast amounts of biochemical and evolutionary data.</p>
 <ul>
 <li><strong>Nodes</strong>: Amino acid residues. A massive <strong>1082-dimensional</strong> feature vector comprising:<ul>
@@ -1015,14 +1038,14 @@
 </li>
 <li><strong>Edges</strong>: Connected if <span class="arithmatex">\(C_\alpha - C_\alpha\)</span> distance <span class="arithmatex">\(\leq 10.0\text{\AA}\)</span>.</li>
 </ul>
-<h2 id="3-surface-point-cloud">3. Surface Point Cloud<a class="headerlink" href="#3-surface-point-cloud" title="Permanent link">&para;</a></h2>
+<h2 id="3-surface-point-cloud">3. Surface Point Cloud</h2>
 <p>Protein interactions fundamentally rely on 3D geometric shape and charge complementarity.</p>
 <ul>
 <li><strong>Generation</strong>: MSMS generates a triangulated solvent-excluded surface. We sample exactly 1024 points uniformly.</li>
 <li><strong>Features</strong>: 14-dimensional vector per point (Coordinates, surface normals, curvature, electrostatics, and nearest-neighbor LSMD projection).</li>
 <li><strong>Encoding</strong>: Processed via a PointNet++ module to yield a 128-d embedding per point.</li>
 </ul>
-<h2 id="4-sequence-language-model-embeddings">4. Sequence Language Model Embeddings<a class="headerlink" href="#4-sequence-language-model-embeddings" title="Permanent link">&para;</a></h2>
+<h2 id="4-sequence-language-model-embeddings">4. Sequence Language Model Embeddings</h2>
 <p>To capture long-range contextual relationships and "grammar" of the protein, ProMaya utilizes <strong>ProtTrans-T5-XL-UniRef50</strong> (a 3B-parameter language model).</p>
 <ul>
 <li><strong>Process</strong>: The FASTA sequence is tokenized and passed through the frozen ProtTrans encoder.</li>

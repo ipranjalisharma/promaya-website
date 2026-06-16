@@ -895,6 +895,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#structural-visualization-pymol" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Structural Visualization (PyMOL)
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -983,13 +994,13 @@
 
 
 
-<h1 id="graph-grad-cam">Graph Grad-CAM<a class="headerlink" href="#graph-grad-cam" title="Permanent link">&para;</a></h1>
+<h1 id="graph-grad-cam">Graph Grad-CAM</h1>
 <p>A major criticism of deep learning in structural biology is the "black box" nature of predictions. It is not enough to know <em>if</em> two proteins interact; biologists must know <em>how</em> and <em>where</em> they interact to design drugs or mutagenesis experiments.</p>
 <p>ProMaya utilizes a customized formulation of <strong>Gradient-weighted Class Activation Mapping (Grad-CAM)</strong>, adapted specifically for Heterogeneous Graph Transformers.</p>
-<h2 id="standard-grad-cam-vs-graph-grad-cam">Standard Grad-CAM vs. Graph Grad-CAM<a class="headerlink" href="#standard-grad-cam-vs-graph-grad-cam" title="Permanent link">&para;</a></h2>
+<h2 id="standard-grad-cam-vs-graph-grad-cam">Standard Grad-CAM vs. Graph Grad-CAM</h2>
 <p>Standard Grad-CAM was designed for 2D Convolutional Neural Networks processing images. It looks at the final 2D feature map and calculates the gradient of the target class with respect to that map.</p>
 <p>ProMaya has no 2D feature map; it has a massive point cloud of node embeddings.</p>
-<h3 id="the-promaya-formulation">The ProMaya Formulation<a class="headerlink" href="#the-promaya-formulation" title="Permanent link">&para;</a></h3>
+<h3 id="the-promaya-formulation">The ProMaya Formulation</h3>
 <p>We calculate the node-level Grad-CAM score directly on the embeddings generated at the <strong>final layer (Layer 4)</strong> of the HGT encoder.</p>
 <ol>
 <li><strong>Calculate Gradients</strong>: Compute the gradient of the predicted interaction score (<span class="arithmatex">\(y^c\)</span>) with respect to the <span class="arithmatex">\(k\)</span>-th dimension of the final hidden embedding for node <span class="arithmatex">\(i\)</span> (<span class="arithmatex">\(H_i^{(L),k}\)</span>).</li>
@@ -1000,26 +1011,42 @@
 </ol>
 <div class="arithmatex">\[\text{GradCAM}(i) = \text{ReLU} \left( \sum_k \alpha_i^k \cdot H_i^{(L),k} \right)\]</div>
 <p>The ReLU activation ensures we only capture features that have a <em>positive</em> influence on predicting an interaction (ignoring features that suppress the prediction).</p>
-<h2 id="code-example">Code Example<a class="headerlink" href="#code-example" title="Permanent link">&para;</a></h2>
-<p>Extracting these values is built directly into the ProMaya API:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">src.interpretability.gradcam</span><span class="w"> </span><span class="kn">import</span> <span class="n">compute_gradcam</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">src.utils.visualization</span><span class="w"> </span><span class="kn">import</span> <span class="n">visualize_attribution</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Compute node-level attribution (target_layer=4)</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">attribution</span> <span class="o">=</span> <span class="n">compute_gradcam</span><span class="p">(</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">protein_a</span><span class="o">=</span><span class="n">protein_a</span><span class="p">,</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">protein_b</span><span class="o">=</span><span class="n">protein_b</span><span class="p">,</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">target_layer</span><span class="o">=</span><span class="mi">4</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">)</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="c1"># Visualize the attribution heat map directly onto the 3D PDB structure</span>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="n">visualize_attribution</span><span class="p">(</span>
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="n">pdb_file</span><span class="o">=</span><span class="s1">&#39;protein_a.pdb&#39;</span><span class="p">,</span>
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>    <span class="n">attribution_scores</span><span class="o">=</span><span class="n">attribution</span><span class="p">[</span><span class="s1">&#39;residue_level&#39;</span><span class="p">],</span>
-</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>    <span class="n">output</span><span class="o">=</span><span class="s1">&#39;attribution_map.png&#39;</span>
-</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="p">)</span>
+<h2 id="code-example">Code Example</h2>
+<div class="language-python highlight"><span class="filename">src/interpretability/pymol_export.py</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">_write_pymol_script</span><span class="p">(</span><span class="n">protein_a_path</span><span class="p">,</span> <span class="n">protein_b_path</span><span class="p">,</span> <span class="n">top_residues_a</span><span class="p">,</span> <span class="n">top_residues_b</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">):</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="sd">    Generates an automated PyMOL script (.pml) to visualize interaction hotspots.</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="sd">    The script loads both PDBs, colors them, and highlights the highest Grad-CAM scoring </span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="sd">    residues as bright red and yellow sticks.</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">script_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="s1">&#39;interaction_view.pml&#39;</span><span class="p">)</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>        <span class="sa">f</span><span class="s1">&#39;load </span><span class="si">{</span><span class="n">protein_a_path</span><span class="si">}</span><span class="s1">, protA&#39;</span><span class="p">,</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>        <span class="sa">f</span><span class="s1">&#39;load </span><span class="si">{</span><span class="n">protein_b_path</span><span class="si">}</span><span class="s1">, protB&#39;</span><span class="p">,</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>        <span class="s1">&#39;hide everything&#39;</span><span class="p">,</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>        <span class="s1">&#39;show cartoon, protA or protB&#39;</span><span class="p">,</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>        <span class="s1">&#39;color marine, protA&#39;</span><span class="p">,</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>        <span class="s1">&#39;color orange, protB&#39;</span><span class="p">,</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>        <span class="s1">&#39;bg_color white&#39;</span><span class="p">,</span>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>        <span class="s1">&#39;set ray_opaque_background, off&#39;</span><span class="p">,</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>    <span class="p">]</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>    <span class="c1"># Highlight top Grad-CAM scoring residues in Protein A</span>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>    <span class="n">selection_a</span> <span class="o">=</span> <span class="s1">&#39; or &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;(protA and resi </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;resseq&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">top_residues_a</span><span class="p">])</span>
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>    <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>        <span class="sa">f</span><span class="s1">&#39;select topA, </span><span class="si">{</span><span class="n">selection_a</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>        <span class="s1">&#39;show sticks, topA&#39;</span><span class="p">,</span>
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>        <span class="s1">&#39;color red, topA&#39;</span><span class="p">,</span>
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>    <span class="p">])</span>
+</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>
+</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">script_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>    <span class="k">return</span> <span class="n">script_path</span>
 </span></code></pre></div>
+<h2 id="structural-visualization-pymol">Structural Visualization (PyMOL)</h2>
+<p>Rather than just returning abstract scores, ProMaya's prediction pipeline automatically writes a <strong><code>.pml</code> script</strong> that can be directly executed by <strong>PyMOL</strong> (or imported into ChimeraX). This allows biologists to:
+- Instantly view the predicted binding interface in high-resolution 3D.
+- Inspect the top-scoring interaction pairs (visualized as dashed distance lines).
+- Identify actionable mutation targets or druggable allosteric pockets directly on the native structure.</p>
 <hr />
 <p><strong>Next:</strong> See how these values are mapped across different biological structures in <a href="multiscale_maps.html">Multi-Scale Attribution →</a></p>
 
